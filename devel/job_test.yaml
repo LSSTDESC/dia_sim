@@ -1,0 +1,58 @@
+
+global:
+  psf_stamp_size: 41
+  outdir: ngrid_test
+  nproc: 20
+
+template:
+  yaml_file: static.yaml
+  coadd_scale: 0.2
+  coadd_image_size: 2000
+  ra_center: 20 # in degrees
+  dec_center: 0 # in degrees
+  num_images: 25
+  meas_config: |
+    config.plugins.names = [
+    "base_SdssCentroid",
+    "base_SdssShape",
+    "base_PsfFlux",
+    "base_SkyCoord",
+    "base_LocalBackground",
+    ]
+  output: coadd_grid
+  write_src: False
+
+  # if defined will ignore other settings and read from disk
+  # read_file: coadd_grid_exp.fits
+
+diff_im:
+  yaml_file: var.yaml
+  diff_im_config: |
+    config.kernel['AL'].detectionConfig.badMaskPlanes=("NO_DATA", "SAT")
+  meas_config: |
+    config.plugins.names = [
+    "base_SdssCentroid",
+    "base_SdssShape",
+    "base_PsfFlux",
+    "base_SkyCoord",
+    "base_LocalBackground",
+    ]
+  num_images: 20
+  files: "*tcat.fits"
+  match_dist: 1 # association match in arcsec
+  write_dia_exp: True
+  write_dia_src: False
+
+association:
+  write_ref_cat: True
+
+forced:
+  write_forced: True
+  forced_meas_config: |
+    config.copyColumns = {"id": "objectId", "parent": "parentObjectId",
+                                 "coord_ra": "coord_ra", "coord_dec": "coord_dec"}
+    config.plugins.names = ["base_SdssShape", "base_DiaTransformedCentroid",
+                                   "base_PsfFlux", "base_LocalBackground",
+                                   "base_PixelFlags"]
+    config.slots.centroid = "base_DiaTransformedCentroid"
+    config.slots.shape = "base_SdssShape"
