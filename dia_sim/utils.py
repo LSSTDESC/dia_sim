@@ -117,6 +117,9 @@ def dm_coadd(exps, global_wcs, sky_box, kernel='lanczos3'):
     # combine stack images using mean
     stats_flags = afwMath.stringToStatisticsProperty("MEAN")
     stats_ctrl = afwMath.StatisticsControl()
+    stats_ctrl.setWeighted(True)
+    stats_ctrl.setCalcErrorFromInputVariance(True)
+
     masked_images = [w.getMaskedImage() for w in wexps]
     stacked_image = afwMath.statisticsStack(
         masked_images, stats_flags, stats_ctrl, weight_list, 0, 0)
